@@ -4,10 +4,11 @@
 # JIRA_API_TOKEN="<MY_JIRA_API_TOKEN>"
 API_URL="https://issues.redhat.com/rest/api/2/issue"
 
-if [ -z "$@" ]; then
+if [ $# -eq 0 ]; then
     echo "export_jira.sh TICKET [TICKET...]"
     exit 1
 fi
+out_file="exported_jira_tickets.txt"
 for issue_key in "$@"; do
     curl -s -X GET \
         -H "Authorization: Bearer $JIRA_API_TOKEN" \
@@ -23,7 +24,7 @@ for issue_key in "$@"; do
          story_points: .fields.customfield_12310243,
          assignee: .fields.assignee.displayName,
          reporter: .fields.reporter.displayName,
-        }'
+        }' >> $out_file
     #out_file="$issue_key.json"
     #curl -s -X GET \
     #    -H "Authorization: Bearer $JIRA_API_TOKEN" \
