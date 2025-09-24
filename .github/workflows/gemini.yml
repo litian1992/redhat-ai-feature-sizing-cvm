@@ -10,7 +10,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install shfmt
-        run: dnf install shfmt -y
+        run: dnf install shfmt git -y
 
       - name: Find changed shell scripts
         id: changed_files
@@ -36,7 +36,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install shellcheck
-        run: dnf install shellcheck -y
+        run: dnf install shellcheck git -y
 
       - name: Find changed shell scripts
         id: changed_files
