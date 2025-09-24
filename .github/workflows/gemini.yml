@@ -5,16 +5,71 @@ on: pull_request
 jobs:
   format-check:
     runs-on: ubuntu-latest
-    container: docker.io/fedora:latest
     steps:
       - uses: actions/checkout@v4
-      - run: dnf install shfmt -y
-      - run: shfmt -s -d *.sh
+
+      - name: Install shfmt
+        run: sudo apt-get install -y shfmt
+
+      - name: Find changed shell scripts
+        id: changed_files
+        run: |
+          git fetch origin main
+          files=$(git diff --name-only origin/main...HEAD | grep '\.sh$' || true)
+          echo "CHANGED_FILES<<EOF" >> $GITHUB_OUTPUT
+          echo "$files" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Run shfmt on changed files
+        if: steps.changed_files.outputs.CHANGED_FILES != ''
+        run: |
+          for file in ${{ steps.changed_files.outputs.CHANGED_FILES }}; do
+            echo "Formatting check for $file"
+            shfmt -s -d "$file"
+          done
 
   static-analysis:
     runs-on: ubuntu-latest
-    container: docker.io/fedora:latest
     steps:
       - uses: actions/checkout@v4
-      - run: dnf install shellcheck -y
-      - run: shellcheck -x *.sh
+
+      - name: Install shellcheck
+        run: sudo apt-get install -y shellcheck
+
+      - name: Find changed shell scripts
+        id: changed_files
+        run: |
+          git fetch origin main
+          files=$(git diff --name-only origin/main...HEAD | grep '\.sh$' || true)
+          echo "CHANGED_FILES<<EOF" >> $GITHUB_OUTPUT
+          echo "$files" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Run shellcheck on changed files
+        if: steps.changed_files.outputs.CHANGED_FILES != ''
+        run: |
+          for file in ${{ steps.changed_files.outputs.CHANGED_FILES }}; do
+            echo "Static analysis for $file"
+            shellcheck -x "$file"
+          done
+
+#name: Gemini PR review
+#
+#on: pull_request
+#
+#jobs:
+#  format-check:
+#    runs-on: ubuntu-latest
+#    container: docker.io/fedora:latest
+#    steps:
+#      - uses: actions/checkout@v4
+#      - run: dnf install shfmt -y
+#      - run: shfmt -s -d *.sh
+#
+#  static-analysis:
+#    runs-on: ubuntu-latest
+#    container: docker.io/fedora:latest
+#    steps:
+#      - uses: actions/checkout@v4
+#      - run: dnf install shellcheck -y
+#      - run: shellcheck -x *.sh
