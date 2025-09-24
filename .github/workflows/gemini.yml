@@ -5,19 +5,18 @@ on: pull_request
 jobs:
   format-check:
     runs-on: ubuntu-latest
-    container: docker.io/fedora:latest
     steps:
       - uses: actions/checkout@v4
 
       - name: Install shfmt
-        run: dnf install shfmt git -y
+        run: sudo apt-get install -y shfmt
 
       - name: Find changed shell scripts
         id: changed_files
         run: |
-          echo "CHANGED_FILES<<EOF" >> $GITHUB_OUTPUT
           git fetch origin main
           files=$(git diff --name-only origin/main...HEAD | grep '\.sh$' || true)
+          echo "CHANGED_FILES<<EOF" >> $GITHUB_OUTPUT
           echo "$files" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
@@ -31,19 +30,18 @@ jobs:
 
   static-analysis:
     runs-on: ubuntu-latest
-    container: docker.io/fedora:latest
     steps:
       - uses: actions/checkout@v4
 
       - name: Install shellcheck
-        run: dnf install shellcheck git -y
+        run: sudo apt-get install -y shellcheck
 
       - name: Find changed shell scripts
         id: changed_files
         run: |
-          echo "CHANGED_FILES<<EOF" >> $GITHUB_OUTPUT
           git fetch origin main
           files=$(git diff --name-only origin/main...HEAD | grep '\.sh$' || true)
+          echo "CHANGED_FILES<<EOF" >> $GITHUB_OUTPUT
           echo "$files" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
