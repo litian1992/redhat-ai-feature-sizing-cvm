@@ -1,0 +1,20 @@
+name: Gemini PR review
+
+on: pull_request
+
+jobs:
+  format-check:
+    runs-on: ubuntu-latest
+    container: docker.io/fedora:latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: dnf install shfmt -y
+      - run: shfmt -s -d *.sh
+
+  static-analysis:
+    runs-on: ubuntu-latest
+    container: docker.io/fedora:latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: dnf install shellcheck -y
+      - run: shellcheck -x *.sh
